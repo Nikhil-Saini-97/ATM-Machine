@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense · tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <style>
+    /* --- reset & base --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f6fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      padding: 1.5rem;
+    }
+
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2rem;
+      padding: 2rem 1.8rem 2.2rem;
+      box-shadow: 0 12px 30px -8px rgba(0, 20, 30, 0.12);
+      border: 1px solid #e9eef3;
+      transition: box-shadow 0.2s;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 550;
+      letter-spacing: -0.02em;
+      color: #1c313f;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1.5px solid #e3eaf0;
+    }
+
+    /* --- input fields --- */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #4b6375;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #dce4ec;
+      border-radius: 1.2rem;
+      font-size: 0.95rem;
+      background: #fafdff;
+      transition: 0.15s ease;
+      color: #142b39;
+      outline: none;
+      font-weight: 450;
+    }
+
+    .input-group input:focus {
+      border-color: #3c6c89;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(48, 103, 138, 0.08);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .input-row .input-group {
+      flex: 1 1 0;
+      min-width: 130px;
+    }
+
+    /* --- button --- */
+    .add-btn {
+      background: #1d3f55;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 2.5rem;
+      font-weight: 550;
+      font-size: 0.95rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.15s ease;
+      width: 100%;
+      margin-top: 0.3rem;
+      letter-spacing: 0.01em;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .add-btn:hover {
+      background: #14303f;
+      transform: scale(0.98);
+      box-shadow: 0 6px 14px -6px rgba(20, 55, 75, 0.25);
+    }
+
+    .add-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* --- expense header --- */
+    .expense-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-top: 2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .expense-header h3 {
+      font-size: 1.1rem;
+      font-weight: 550;
+      color: #1a3140;
+      letter-spacing: -0.01em;
+    }
+
+    .count-badge {
+      background: #e4edf4;
+      border-radius: 30px;
+      padding: 0.1rem 0.7rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #1f4056;
+    }
+
+    /* --- expense list --- */
+    #expenseList {
+      list-style: none;
+      padding: 0;
+      margin: 0.2rem 0 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    #expenseList li {
+      background: #f3f8fd;
+      padding: 0.6rem 1.1rem;
+      border-radius: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      color: #112631;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: background 0.1s;
+    }
+
+    #expenseList li:hover {
+      background: #eaf2f9;
+    }
+
+    .expense-name {
+      font-weight: 480;
+      color: #1e3e55;
+    }
+
+    .expense-amount {
+      background: #dce8f0;
+      padding: 0.1rem 0.9rem;
+      border-radius: 40px;
+      font-weight: 550;
+      font-size: 0.85rem;
+      color: #0b283a;
+    }
+
+    .empty-message {
+      color: #7b93a3;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 1rem 0;
+      background: #f6fafd;
+      border-radius: 3rem;
+      border: 1px dashed #cbdae6;
+      margin: 0.2rem 0 0.3rem;
+    }
+
+    /* --- delete "x" as plain text --- */
+    .delete-btn {
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: #56748b;
+      background: transparent;
+      border: none;
+      padding: 0 0.2rem;
+      line-height: 1;
+      transition: 0.1s;
+      margin-left: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    .delete-btn:hover {
+      color: #b14545;
+      font-weight: 400;
+    }
+
+    /* --- total --- */
+    #total {
+      margin-top: 0.6rem;
+      font-size: 1.2rem;
+      font-weight: 550;
+      color: #0a283b;
+      background: #e7f0f7;
+      padding: 0.6rem 1.2rem;
+      border-radius: 3rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      letter-spacing: -0.01em;
+    }
+
+    /* --- scroll --- */
+    #expenseList::-webkit-scrollbar {
+      width: 5px;
+    }
+    #expenseList::-webkit-scrollbar-track {
+      background: #e3eaf0;
+      border-radius: 10px;
+    }
+    #expenseList::-webkit-scrollbar-thumb {
+      background: #b8ccdb;
+      border-radius: 10px;
+    }
+    #expenseList::-webkit-scrollbar-thumb:hover {
+      background: #9bb3c5;
+    }
+
+    /* --- responsive --- */
+    @media (max-width: 450px) {
+      .container {
+        padding: 1.5rem 1rem;
+        border-radius: 1.8rem;
+      }
+      .input-row {
+        flex-direction: column;
+        gap: 0.1rem;
+      }
+      .input-row .input-group {
+        min-width: unset;
+      }
+      .add-btn {
+        padding: 0.75rem;
+      }
+      #total {
+        font-size: 1.05rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Expense Tracker</h2>
+
+  <div class="input-row">
+    <div class="input-group">
+      <label for="expenseName">Expense name</label>
+      <input type="text" id="expenseName" placeholder="e.g. Coffee" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label for="amount">Amount ($)</label>
+      <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01">
+    </div>
+  </div>
+
+  <button class="add-btn" onclick="addExpense()">Add Expense</button>
+
+  <div class="expense-header">
+    <h3>Expenses</h3>
+    <span class="count-badge" id="expenseCount">0</span>
+  </div>
+
+  <ul id="expenseList">
+    <li class="empty-message">No expenses yet</li>
+  </ul>
+
+  <div id="total">Total: 0</div>
+</div>
+
+<script>
+  (function() {
+    // ---- state ----
+    let totalExpense = 0;
+    let expenseItems = [];      // { name, amount }
+
+    const expenseListEl = document.getElementById('expenseList');
+    const totalEl = document.getElementById('total');
+    const expenseNameInput = document.getElementById('expenseName');
+    const amountInput = document.getElementById('amount');
+    const expenseCountEl = document.getElementById('expenseCount');
+
+    // helper: format with 2 decimals
+    function formatAmount(amount) {
+      return Number(amount).toFixed(2);
+    }
+
+    // render list, total, count
+    function render() {
+      expenseListEl.innerHTML = '';
+
+      if (expenseItems.length === 0) {
+        const emptyLi = document.createElement('li');
+        emptyLi.className = 'empty-message';
+        emptyLi.textContent = 'No expenses yet';
+        expenseListEl.appendChild(emptyLi);
+      } else {
+        expenseItems.forEach((item, index) => {
+          const li = document.createElement('li');
+
+          // left: name
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'expense-name';
+          nameSpan.textContent = item.name;
+
+          // right: amount + delete (plain text)
+          const rightWrapper = document.createElement('span');
+          rightWrapper.style.display = 'flex';
+          rightWrapper.style.alignItems = 'center';
+          rightWrapper.style.gap = '0.5rem';
+
+          const amountSpan = document.createElement('span');
+          amountSpan.className = 'expense-amount';
+          amountSpan.textContent = `$${formatAmount(item.amount)}`;
+
+          const deleteBtn = document.createElement('span');
+          deleteBtn.className = 'delete-btn';
+          deleteBtn.textContent = '×';   // simple multiplication sign
+          deleteBtn.setAttribute('aria-label', 'Delete expense');
+
+          // delete action
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const removed = expenseItems.splice(index, 1)[0];
+            if (removed) {
+              totalExpense -= removed.amount;
+              totalExpense = Math.round((totalExpense + Number.EPSILON) * 100) / 100;
+            }
+            render();
+          });
+
+          rightWrapper.appendChild(amountSpan);
+          rightWrapper.appendChild(deleteBtn);
+
+          li.appendChild(nameSpan);
+          li.appendChild(rightWrapper);
+          expenseListEl.appendChild(li);
+        });
+      }
+
+      // update total
+      totalEl.textContent = `Total: ${formatAmount(totalExpense)}`;
+      // update count
+      expenseCountEl.textContent = expenseItems.length;
+    }
+
+    // ---- add expense (global) ----
+    window.addExpense = function() {
+      const name = expenseNameInput.value.trim();
+      let amount = parseFloat(amountInput.value);
+
+      // validation : name
+      if (name === '') {
+        expenseNameInput.style.borderColor = '#c95a5a';
+        expenseNameInput.style.boxShadow = '0 0 0 3px rgba(201, 90, 90, 0.08)';
+        setTimeout(() => {
+          expenseNameInput.style.borderColor = '#dce4ec';
+          expenseNameInput.style.boxShadow = 'none';
+        }, 400);
+        return;
+      }
+
+      // validation : amount
+      if (isNaN(amount) || amount <= 0) {
+        amountInput.style.borderColor = '#c95a5a';
+        amountInput.style.boxShadow = '0 0 0 3px rgba(201, 90, 90, 0.08)';
+        setTimeout(() => {
+          amountInput.style.borderColor = '#dce4ec';
+          amountInput.style.boxShadow = 'none';
+        }, 400);
+        return;
+      }
+
+      amount = Math.round(amount * 100) / 100;
+
+      expenseItems.push({ name, amount });
+      totalExpense += amount;
+      totalExpense = Math.round((totalExpense + Number.EPSILON) * 100) / 100;
+
+      expenseNameInput.value = '';
+      amountInput.value = '';
+
+      render();
+      expenseNameInput.focus();
+    };
+
+    // ---- enter key ----
+    function handleKeypress(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.addExpense();
+      }
+    }
+
+    expenseNameInput.addEventListener('keypress', handleKeypress);
+    amountInput.addEventListener('keypress', handleKeypress);
+
+    // ---- initial render ----
+    render();
+
+    // click on empty message → focus name
+    expenseListEl.addEventListener('click', (e) => {
+      if (e.target.classList.contains('empty-message') || e.target.closest('.empty-message')) {
+        expenseNameInput.focus();
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>

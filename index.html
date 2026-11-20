@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Expense Tracker</h2>3
+        Expense Name :
+        <input type="text" id = "expenseName"> <br> <br>
+        Amount :
+        <input type="number" id = "amount"> <br> <br>
+        <button onclick="addExpense()">Add Expense</button>
+        
+        <h3>Expenses : </h3>
+        <ul id = "expenseList"></ul>
+        <h3 id = "total">Total Expense : 0</h3>
+    </div>
+</body>
+
+<script>
+    let totalExpense = 0;
+    function addExpense() {
+        let name = document.getElementById("expenseName").value;
+        let amount = Number(document.getElementById("amount").value);
+
+        if(name !=  "" && amount > 0) {
+            let li = document.createElement("li");
+            li.innerHTML = name + "-" + amount + "/";
+            document.getElementById("expenseList").appendChild(li);
+            totalExpense += amount;
+            document.getElementById("total").innerHTML = "Total Expenses : " + totalExpense;
+            document.getElementById("expenseName").value = " ";
+            document.getElementById("amount").value = " ";
+        }
+    }
+</script>
+</html>
